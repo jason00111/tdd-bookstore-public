@@ -19,9 +19,8 @@ server.post('/api/test/reset-db', (req, res) => {
 
 server.post('/api/books', (req, res) => {
   if (req.body.title) {
-    const id = Math.floor(Math.random() * 1000000)
     books.push({
-      id: id,
+      id: books.length,
       title: req.body.title,
       author: req.body.author,
       year: req.body.year,
@@ -40,11 +39,11 @@ server.post('/api/books', (req, res) => {
 server.get('/api/books', (req, res) => {
   if (Object.keys(req.query).length === 0 || req.query.hasOwnProperty('page')) {
     const page = req.query.page || 1
-    let tenBooks = []
+    let results = []
     for (var i = 10 * (page - 1); i < 10 * page; i++) {
-      tenBooks.push(books[i])
+      results.push(books[i])
     }
-    res.json(tenBooks)
+    res.json(results)
   } else if (req.query.hasOwnProperty('author')) {
     let results = []
     for (let book of books) {
@@ -72,6 +71,22 @@ server.get('/api/books', (req, res) => {
   } else {
     res.end()
   }
+})
+
+server.get('/api/authors', (req, res) => {
+  let authors = []
+  for (let book of books) {
+    if (book.author && authors.indexOf(book.author) === -1) authors.push(book.author)
+  }
+  const page = req.query.page || 1
+  let results = []
+  for (var i = 10 * (page - 1); i < 10 * page; i++) {
+    results.push({
+      id: authors[i],
+      name: authors[i]
+    })
+  }
+  res.json(results)
 })
 
 if (process.env.NODE_ENV !== 'test'){
