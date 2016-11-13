@@ -82,11 +82,53 @@ server.get('/api/authors', (req, res) => {
   let results = []
   for (var i = 10 * (page - 1); i < 10 * page; i++) {
     results.push({
-      id: authors[i],
+      id: i,
       name: authors[i]
     })
   }
   res.json(results)
+})
+
+server.get('/api/books/:id', (req, res) => {
+  if (books[req.params.id]) {
+    res.json(books[req.params.id])
+  } else {
+    res.status(404).json()
+  }
+})
+
+server.get('/api/genres', (req, res) => {
+  let genres = []
+  for (let book of books) {
+    if (book.genres) {
+      for (let genre of book.genres) {
+        if (genres.indexOf(genre) === -1) genres.push(genre)
+      }
+    }
+  }
+  genres.sort()
+  const page = req.query.page || 1
+  let results = []
+  for (var i = 10 * (page - 1); i < 10 * page; i++) {
+    results.push({
+      id: i,
+      name: genres[i]
+    })
+  }
+  res.json(results)
+})
+
+server.post('/api/books/:id', (req, res) => {
+  const id = req.params.id
+  books[id].title = req.body.title
+  books[id].author = req.body.author
+  books[id].year = req.body.year
+  res.json(books[id])
+})
+
+server.post('/api/books/:id/delete', (req, res) => {
+  delete books[req.params.id]
+  res.json()
 })
 
 if (process.env.NODE_ENV !== 'test'){
