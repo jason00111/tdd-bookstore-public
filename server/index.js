@@ -37,40 +37,46 @@ server.post('/api/books', (req, res) => {
 })
 
 server.get('/api/books', (req, res) => {
+  let results = []
   if (Object.keys(req.query).length === 0 || req.query.hasOwnProperty('page')) {
     const page = req.query.page || 1
-    let results = []
     for (var i = 10 * (page - 1); i < 10 * page; i++) {
       results.push(books[i])
     }
     res.json(results)
-  } else if (req.query.hasOwnProperty('author')) {
-    let results = []
+  }
+  if (req.query.hasOwnProperty('author')) {
     for (let book of books) {
       if (book.author.toLowerCase().includes(req.query.author.toLowerCase())) {
         results.push(book)
       }
     }
-    res.json(results)
-  } else if (req.query.hasOwnProperty('title')) {
-    let results = []
-    for (let book of books) {
-      if (book.title.toLowerCase().includes(req.query.title.toLowerCase())) {
-        results.push(book)
-      }
-    }
-    res.json(results)
-  } else if (req.query.hasOwnProperty('year')) {
-    let results = []
-    for (let book of books) {
-      if (book.year == req.query.year) {
-        results.push(book)
-      }
-    }
-    res.json(results)
-  } else {
-    res.end()
   }
+  if (req.query.hasOwnProperty('title')) {
+    if (results.length === 0) {
+      for (let book of books) {
+        if (book.title.toLowerCase().includes(req.query.title.toLowerCase())) {
+          results.push(book)
+        }
+      }
+    } else {
+      results = results.filter( book =>
+        book.title.toLowerCase().includes(req.query.title.toLowerCase())
+      )
+    }
+  }
+  if (req.query.hasOwnProperty('year')) {
+    if (results.length === 0) {
+      for (let book of books) {
+        if (book.year == req.query.year) {
+          results.push(book)
+        }
+      }
+    } else {
+      results = results.filter( book => book.year == req.query.year)
+    }
+  }
+  res.json(results)
 })
 
 server.get('/api/authors', (req, res) => {
