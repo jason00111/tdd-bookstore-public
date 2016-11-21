@@ -123,7 +123,7 @@ const getWholeBookById = bookId => {
 
     let wholeBook = book
     wholeBook.author = author
-    wholeBook.genres = genres
+    wholeBook.genres = genres.sort()
 
     return wholeBook
   })
